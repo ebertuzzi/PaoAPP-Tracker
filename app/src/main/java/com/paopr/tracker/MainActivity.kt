@@ -86,14 +86,32 @@ fun PaoPRApp() {
             },
             bottomBar = {
                 NavigationBar {
-                    NavigationBarItem(screen == "dashboard", { screen = "dashboard" }, { Icon(Icons.Default.Home, null) }, { Text("Inicio") })
-                    NavigationBarItem(screen == "exercises", { screen = "exercises" }, { Icon(Icons.Default.FitnessCenter, null) }, { Text("Ejercicios") })
-                    NavigationBarItem(screen == "settings", { screen = "settings" }, { Icon(Icons.Default.Settings, null) }, { Text("Ajustes") })
+                    NavigationBarItem(
+                        selected = screen == "dashboard",
+                        onClick = { screen = "dashboard" },
+                        icon = { Icon(Icons.Default.Home, contentDescription = null) },
+                        label = { Text("Inicio") }
+                    )
+                    NavigationBarItem(
+                        selected = screen == "exercises",
+                        onClick = { screen = "exercises" },
+                        icon = { Icon(Icons.Default.FitnessCenter, contentDescription = null) },
+                        label = { Text("Ejercicios") }
+                    )
+                    NavigationBarItem(
+                        selected = screen == "settings",
+                        onClick = { screen = "settings" },
+                        icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                        label = { Text("Ajustes") }
+                    )
                 }
             },
             floatingActionButton = {
-                if (screen == "dashboard" || screen == "exercises")
-                    FloatingActionButton(onClick = { showAdd = true }, containerColor = Blue) { Icon(Icons.Default.Add, null) }
+                if (screen == "dashboard" || screen == "exercises") {
+                    FloatingActionButton(onClick = { showAdd = true }, containerColor = Blue) {
+                        Icon(Icons.Default.Add, contentDescription = null)
+                    }
+                }
             }
         ) { pad ->
             Box(Modifier.padding(pad).fillMaxSize()) {
@@ -229,7 +247,7 @@ fun FilterChipItem(selected: Boolean, onClick: () -> Unit, label: String) {
         onClick = onClick,
         label = { Text(label) },
         leadingIcon = if (selected) {
-            { Icon(Icons.Default.Check, null) }
+            { Icon(Icons.Default.Check, contentDescription = null) }
         } else null
     )
 }
