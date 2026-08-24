@@ -87,21 +87,21 @@ fun PaoPRApp() {
             bottomBar = {
                 NavigationBar {
                     NavigationBarItem(
-                        selected = screen == "dashboard",
+                        selected = (screen == "dashboard"),
                         onClick = { screen = "dashboard" },
-                        icon = { Icon(Icons.Default.Home, contentDescription = null) },
+                        icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
                         label = { Text("Inicio") }
                     )
                     NavigationBarItem(
-                        selected = screen == "exercises",
+                        selected = (screen == "exercises"),
                         onClick = { screen = "exercises" },
-                        icon = { Icon(Icons.Default.FitnessCenter, contentDescription = null) },
+                        icon = { Icon(Icons.Default.FitnessCenter, contentDescription = "Ejercicios") },
                         label = { Text("Ejercicios") }
                     )
                     NavigationBarItem(
-                        selected = screen == "settings",
+                        selected = (screen == "settings"),
                         onClick = { screen = "settings" },
-                        icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                        icon = { Icon(Icons.Default.Settings, contentDescription = "Ajustes") },
                         label = { Text("Ajustes") }
                     )
                 }
@@ -109,7 +109,7 @@ fun PaoPRApp() {
             floatingActionButton = {
                 if (screen == "dashboard" || screen == "exercises") {
                     FloatingActionButton(onClick = { showAdd = true }, containerColor = Blue) {
-                        Icon(Icons.Default.Add, contentDescription = null)
+                        Icon(Icons.Default.Add, contentDescription = "Agregar")
                     }
                 }
             }
@@ -146,7 +146,7 @@ fun Dashboard(ex: List<Exercise>, rec: List<Record>, unit: String, open: (Exerci
             }
         }
         Button(onClick = add, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
-            Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text("Registrar PR")
+            Icon(Icons.Default.Add, contentDescription = null); Spacer(Modifier.width(8.dp)); Text("Registrar PR")
         }
         Text("Mis ejercicios", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Slate)
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -159,7 +159,7 @@ fun Dashboard(ex: List<Exercise>, rec: List<Record>, unit: String, open: (Exerci
                             Text(e.name, fontWeight = FontWeight.SemiBold)
                             Text(if (best == null) "Sin registros" else "PR ${fmt(best, unit)} $unit", color = Slate, fontSize = 13.sp)
                         }
-                        Icon(Icons.Default.ChevronRight, null)
+                        Icon(Icons.Default.ChevronRight, contentDescription = null)
                     }
                 }
             }
@@ -176,7 +176,7 @@ fun ExerciseList(ex: List<Exercise>, open: (Exercise) -> Unit, add: () -> Unit) 
             items(ex) { e ->
                 Card(Modifier.fillMaxWidth().clickable { open(e) }, shape = RoundedCornerShape(16.dp)) {
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text(e.icon, fontSize = 28.sp); Spacer(Modifier.width(14.dp)); Text(e.name, fontWeight = FontWeight.SemiBold); Spacer(Modifier.weight(1f)); Icon(Icons.Default.ChevronRight, null)
+                        Text(e.icon, fontSize = 28.sp); Spacer(Modifier.width(14.dp)); Text(e.name, fontWeight = FontWeight.SemiBold); Spacer(Modifier.weight(1f)); Icon(Icons.Default.ChevronRight, contentDescription = null)
                     }
                 }
             }
@@ -194,7 +194,7 @@ fun Detail(e: Exercise, rec: List<Record>, unit: String, delete: (Record) -> Uni
         if (rec.size >= 2) ProgressChart(rec.sortedBy { it.date }.map { it.kg }, unit)
         else Card(Modifier.fillMaxWidth()) { Text("Registra al menos dos PR para ver tu progreso.", Modifier.padding(18.dp), color = Slate) }
         Spacer(Modifier.height(12.dp))
-        Button(onClick = add, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(8.dp)); Text("Registrar nuevo PR") }
+        Button(onClick = add, modifier = Modifier.fillMaxWidth()) { Icon(Icons.Default.Add, contentDescription = null); Spacer(Modifier.width(8.dp)); Text("Registrar nuevo PR") }
         Spacer(Modifier.height(12.dp))
         rec.sortedByDescending { it.date }.forEach { r ->
             Card(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
@@ -204,7 +204,7 @@ fun Detail(e: Exercise, rec: List<Record>, unit: String, delete: (Record) -> Uni
                         Text(r.date)
                         if (r.comment.isNotBlank()) Text(r.comment, color = Slate)
                     }
-                    IconButton(onClick = { delete(r) }) { Icon(Icons.Default.Delete, null) }
+                    IconButton(onClick = { delete(r) }) { Icon(Icons.Default.Delete, contentDescription = null) }
                 }
             }
         }
@@ -233,9 +233,9 @@ fun Settings(unit: String, set: (String) -> Unit) {
         Text("Ajustes", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Slate)
         Text("Unidad de peso", fontWeight = FontWeight.Bold)
         Row(verticalAlignment = Alignment.CenterVertically) {
-            FilterChipItem(selected = unit == "kg", onClick = { set("kg") }, label = "kg")
+            FilterChipItem(selected = (unit == "kg"), onClick = { set("kg") }, label = "kg")
             Spacer(Modifier.width(10.dp))
-            FilterChipItem(selected = unit == "lb", onClick = { set("lb") }, label = "lb")
+            FilterChipItem(selected = (unit == "lb"), onClick = { set("lb") }, label = "lb")
         }
         Text("Los datos se almacenan localmente en el teléfono.", color = Slate)
     }
