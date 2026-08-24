@@ -75,25 +75,50 @@ fun PaoPRApp() {
         }
     }
 
+    val topBarComposable: @Composable () -> Unit = {
+        TopAppBar(
+            title = { Text("PaoPR Tracker", fontWeight = FontWeight.Bold) },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = Pale)
+        )
+    }
+
+    val bottomBarComposable: @Composable () -> Unit = {
+        NavigationBar {
+            NavigationBarItem(
+                selected = (screen == "dashboard"),
+                onClick = { screen = "dashboard" },
+                icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
+                label = { Text("Inicio") }
+            )
+            NavigationBarItem(
+                selected = (screen == "exercises"),
+                onClick = { screen = "exercises" },
+                icon = { Icon(Icons.Default.FitnessCenter, contentDescription = "Ejercicios") },
+                label = { Text("Ejercicios") }
+            )
+            NavigationBarItem(
+                selected = (screen == "settings"),
+                onClick = { screen = "settings" },
+                icon = { Icon(Icons.Default.Settings, contentDescription = "Ajustes") },
+                label = { Text("Ajustes") }
+            )
+        }
+    }
+
+    val fabComposable: @Composable () -> Unit = {
+        if (screen == "dashboard" || screen == "exercises") {
+            FloatingActionButton(onClick = { showAdd = true }, containerColor = Blue) {
+                Icon(Icons.Default.Add, contentDescription = "Agregar")
+            }
+        }
+    }
+
     MaterialTheme(colorScheme = lightColorScheme(primary = Blue, background = Pale, surface = Color.White)) {
         Scaffold(
             containerColor = Pale,
-            topBar = {
-                TopAppBar(
-                    title = { Text("PaoPR Tracker", fontWeight = FontWeight.Bold) },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Pale)
-                )
-            },
-            bottomBar = {
-                AppBottomBar(currentScreen = screen, onSelectScreen = { screen = it })
-            },
-            floatingActionButton = {
-                if (screen == "dashboard" || screen == "exercises") {
-                    FloatingActionButton(onClick = { showAdd = true }, containerColor = Blue) {
-                        Icon(Icons.Default.Add, contentDescription = "Agregar")
-                    }
-                }
-            }
+            topBar = topBarComposable,
+            bottomBar = bottomBarComposable,
+            floatingActionButton = fabComposable
         ) { pad ->
             Box(Modifier.padding(pad).fillMaxSize()) {
                 when (screen) {
@@ -108,30 +133,6 @@ fun PaoPRApp() {
                 }, { showAdd = false })
             }
         }
-    }
-}
-
-@Composable
-fun AppBottomBar(currentScreen: String, onSelectScreen: (String) -> Unit) {
-    NavigationBar {
-        NavigationBarItem(
-            selected = (currentScreen == "dashboard"),
-            onClick = { onSelectScreen("dashboard") },
-            icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
-            label = { Text("Inicio") }
-        )
-        NavigationBarItem(
-            selected = (currentScreen == "exercises"),
-            onClick = { onSelectScreen("exercises") },
-            icon = { Icon(Icons.Default.FitnessCenter, contentDescription = "Ejercicios") },
-            label = { Text("Ejercicios") }
-        )
-        NavigationBarItem(
-            selected = (currentScreen == "settings"),
-            onClick = { onSelectScreen("settings") },
-            icon = { Icon(Icons.Default.Settings, contentDescription = "Ajustes") },
-            label = { Text("Ajustes") }
-        )
     }
 }
 
@@ -248,14 +249,14 @@ fun Settings(unit: String, set: (String) -> Unit) {
 
 @Composable 
 fun FilterChipItem(selected: Boolean, onClick: () -> Unit, label: String) {
-    val leadingIconComposable: (@Composable () -> Unit)? = if (selected) {
+    val iconBlock: (@Composable () -> Unit)? = if (selected) {
         { Icon(Icons.Default.Check, contentDescription = null) }
     } else null
 
     AssistChip(
         onClick = onClick,
         label = { Text(label) },
-        leadingIcon = leadingIconComposable
+        leadingIcon = iconBlock
     )
 }
 
