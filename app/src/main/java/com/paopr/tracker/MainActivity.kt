@@ -176,22 +176,134 @@ NavigationBarItem(
     }
 }
 
-@Composable fun Detail(e:Exercise, rec:List<Record>, unit:String, delete:(Record)->Unit, add:()->Unit) {
-    Column(Modifier.padding(20.dp)) {
-        Text("${e.icon}  ${e.name}",fontSize=27.sp,fontWeight=FontWeight.Bold,color=Slate)
-        val best=rec.maxOfOrNull{it.kg}
-        Text(if(best==null)"Aún no hay PR" else "PR actual: ${fmt(best,unit)} $unit",fontSize=19.sp,color=Blue,fontWeight=FontWeight.Bold)
-        Spacer(Modifier.height(12.dp))
-        if(rec.size>=2) ProgressChart(rec.sortedBy{it.date}.map{it.kg}, unit)
-        else Card(Modifier.fillMaxWidth()){Text("Registra al menos dos PR para ver tu progreso.",Modifier.padding(18.dp),color=Slate)}
-        Spacer(Modifier.height(12.dp))
-        Button(onClick=add,modifier=Modifier.fillMaxWidth()){Icon(Icons.Default.Add,null);Spacer(Modifier.width(8.dp));Text("Registrar nuevo PR")}
-        Spacer(Modifier.height(12.dp))
-        rec.sortedByDescending{it.date}.forEach { r ->
-            Card(Modifier.fillMaxWidth().padding(vertical=4.dp)) {
-                Row(Modifier.padding(14.dp),verticalAlignment=Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)){Text("${fmt(r.kg,unit)} $unit",fontSize=20.sp,fontWeight=FontWeight.Bold);Text(r.date);if(r.comment.isNotBlank())Text(r.comment,color=Slate)}
-                    IconButton({delete(r)}){Icon(Icons.Default.Delete,null)}
+@Composable
+fun Detail(
+    e: Exercise,
+    rec: List<Record>,
+    unit: String,
+    delete: (Record) -> Unit,
+    add: () -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        contentPadding = PaddingValues(
+            top = 0.dp,
+            bottom = 24.dp
+        )
+    ) {
+        item {
+            Text(
+                "${e.icon}  ${e.name}",
+                fontSize = 27.sp,
+                fontWeight = FontWeight.Bold,
+                color = Slate
+            )
+        }
+
+        item {
+            val best = rec.maxOfOrNull { it.kg }
+
+            Text(
+                if (best == null)
+                    "Aún no hay PR"
+                else
+                    "PR actual: ${fmt(best, unit)} $unit",
+                fontSize = 19.sp,
+                color = Blue,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        item {
+            if (rec.size >= 2) {
+                ProgressChart(
+                    rec.sortedBy { it.date }.map { it.kg },
+                    unit
+                )
+            } else {
+                Card(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        "Registra al menos dos PR para ver tu progreso.",
+                        modifier = Modifier.padding(18.dp),
+                        color = Slate
+                    )
+                }
+            }
+        }
+
+        item {
+            Button(
+                onClick = add,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.Add, null)
+                Spacer(Modifier.width(8.dp))
+                Text("Registrar nuevo PR")
+            }
+        }
+
+        if (rec.isNotEmpty()) {
+            item {
+                Text(
+                    "Registros guardados",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Slate,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+        }
+
+        items(
+            items = rec.sortedByDescending { it.date },
+            key = { it.id }
+        ) { r ->
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            "${fmt(r.kg, unit)} $unit",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Text(
+                            r.date,
+                            color = Slate
+                        )
+
+                        if (r.comment.isNotBlank()) {
+                            Spacer(Modifier.height(4.dp))
+
+                            Text(
+                                r.comment,
+                                color = Slate
+                            )
+                        }
+                    }
+
+                    IconButton(
+                        onClick = { delete(r) }
+                    ) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Eliminar registro"
+                        )
+                    }
                 }
             }
         }
