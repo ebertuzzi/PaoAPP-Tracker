@@ -86,9 +86,26 @@ class MainActivity : ComponentActivity() {
             },
             bottomBar = {
                 NavigationBar {
-                    NavigationBarItem(screen=="dashboard", {screen="dashboard"}, { Icon(Icons.Default.Home,null) }, { Text("Inicio") })
-                    NavigationBarItem(screen=="exercises", {screen="exercises"}, { Icon(Icons.Default.FitnessCenter,null) }, { Text("Ejercicios") })
-                    NavigationBarItem(screen=="settings", {screen="settings"}, { Icon(Icons.Default.Settings,null) }, { Text("Ajustes") })
+                    NavigationBarItem(
+    selected = screen == "dashboard",
+    onClick = { screen = "dashboard" },
+    icon = { Icon(Icons.Default.Home, contentDescription = null) },
+    label = { Text("Inicio") }
+)
+
+NavigationBarItem(
+    selected = screen == "exercises",
+    onClick = { screen = "exercises" },
+    icon = { Icon(Icons.Default.FitnessCenter, contentDescription = null) },
+    label = { Text("Ejercicios") }
+)
+
+NavigationBarItem(
+    selected = screen == "settings",
+    onClick = { screen = "settings" },
+    icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+    label = { Text("Ajustes") }
+)
                 }
             },
             floatingActionButton = {
