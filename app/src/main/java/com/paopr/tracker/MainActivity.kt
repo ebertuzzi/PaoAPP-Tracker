@@ -52,6 +52,7 @@ class MainActivity : ComponentActivity() {
         setContent { PaoPRApp() }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaoPRApp() {
@@ -174,6 +175,7 @@ fun PaoPRApp() {
                         exercises = exercises,
                         unit = unit,
                         initialRecord = null,
+                        preselectedExercise = selected,
                         onSave = { ex, value, date, comment ->
                             records = records + Record(
                                 UUID.randomUUID().toString(),
@@ -195,6 +197,7 @@ fun PaoPRApp() {
                         exercises = exercises,
                         unit = unit,
                         initialRecord = record,
+                        preselectedExercise = null,
                         onSave = { ex, value, date, comment ->
                             records = records.map {
                                 if (it.id == record.id) {
@@ -511,16 +514,17 @@ fun RecordDialog(
     exercises: List<Exercise>,
     unit: String,
     initialRecord: Record?,
+    preselectedExercise: Exercise? = null,
     onSave: (Exercise, Double, String, String) -> Unit,
     onCancel: () -> Unit
 ) {
     val context = LocalContext.current
 
-    var selected by remember(initialRecord) {
+    var selected by remember(initialRecord, preselectedExercise) {
         mutableStateOf(
-            exercises.firstOrNull {
-                it.id == initialRecord?.exerciseId
-            } ?: exercises.first()
+            preselectedExercise
+                ?: exercises.firstOrNull { it.id == initialRecord?.exerciseId }
+                ?: exercises.first()
         )
     }
 
