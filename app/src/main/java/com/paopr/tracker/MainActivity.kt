@@ -30,6 +30,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 
 private val ComponentActivity.dataStore by preferencesDataStore("paopr")
 private val Blue = Color(0xFF4E78A0)
@@ -51,7 +52,7 @@ class MainActivity : ComponentActivity() {
         setContent { PaoPRApp() }
     }
 }
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaoPRApp() {
     val context = LocalContext.current
