@@ -659,17 +659,20 @@ fun RecordDialog(
 fun defaultExercises() = listOf(
     Exercise("bs", "Back Squat", "🏋️"),
     Exercise("fs", "Front Squat", "🏋️"),
-    Exercise("dl", "Deadlift", "🦾"),
-    Exercise("sn", "Snatch", "🏋️"),
+    Exercise("dl", "Deadlift", "🏋️"),
     Exercise("cj", "Clean & Jerk", "🏋️"),
-    Exercise("pc", "Power Clean", "⚡"),
-    Exercise("c", "Clean", "🏋️"),
-    Exercise("pp", "Push Press", "🏋️"),
-    Exercise("ohp", "Overhead Press", "💪"),
-    Exercise("bp", "Bench Press", "💪"),
-    Exercise("thr", "Thruster", "🔥"),
+    Exercise("ps", "Power Snatch", "🏋️"),
+    Exercise("ss", "Squat Snatch", "🏋️"),
+    Exercise("pc", "Power Clean", "🏋️"),
+    Exercise("sc", "Squat Clean", "🏋️"),
     Exercise("ohs", "Overhead Squat", "🏋️"),
-    Exercise("row", "Barbell Row", "🦾")
+    Exercise("sp", "Shoulder Press", "🏋️"),
+    Exercise("pp", "Push Press", "🏋️"),
+    Exercise("pj", "Push Jerk", "🏋️"),
+    Exercise("bp", "Bench Press", "🏋️"),
+    Exercise("thr", "Thruster", "🏋️"),
+    Exercise("ohs", "Overhead Squat", "🏋️"),
+
 )
 
 fun fmt(kg: Double, u: String) = String.format(
