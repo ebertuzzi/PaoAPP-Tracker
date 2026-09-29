@@ -664,6 +664,7 @@ fun defaultExercises() = listOf(
     Exercise("cj", "Clean & Jerk", "🏋️"),
     Exercise("pc", "Power Clean", "⚡"),
     Exercise("c", "Clean", "🏋️"),
+    Exercise("pp", "Push Press", "🏋️"),
     Exercise("ohp", "Overhead Press", "💪"),
     Exercise("bp", "Bench Press", "💪"),
     Exercise("thr", "Thruster", "🔥"),
