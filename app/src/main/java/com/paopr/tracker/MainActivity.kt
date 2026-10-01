@@ -31,6 +31,8 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 
 private val ComponentActivity.dataStore by preferencesDataStore("paopr")
 private val Blue = Color(0xFF4E78A0)
@@ -65,6 +67,64 @@ fun PaoPRApp() {
     var selected by remember { mutableStateOf<Exercise?>(null) }
     var showAdd by remember { mutableStateOf(false) }
     var editingRecord by remember { mutableStateOf<Record?>(null) }
+    val exportLauncher = rememberLauncherForActivityResult(
+    ActivityResultContracts.CreateDocument("application/json")
+) { uri ->
+    uri?.let {
+        val backup = JSONObject().apply {
+            put("version", 1)
+            put("unit", unit)
+            put("exercises", JSONArray(encodeExercises(exercises)))
+            put("records", JSONArray(encodeRecords(records)))
+        }.toString(2)
+
+        runCatching {
+            context.contentResolver.openOutputStream(it)?.use { output ->
+                output.write(backup.toByteArray(Charsets.UTF_8))
+            }
+        }
+    }
+}
+
+val importLauncher = rememberLauncherForActivityResult(
+    ActivityResultContracts.OpenDocument()
+) { uri ->
+    uri?.let {
+        runCatching {
+            context.contentResolver.openInputStream(it)?.use { input ->
+                JSONObject(
+                    input.bufferedReader().use { reader ->
+                        reader.readText()
+                    }
+                )
+            } ?: throw IllegalStateException("No se pudo abrir el archivo")
+        }.onSuccess { backup ->
+
+            val importedExercises =
+                decodeExercises(backup.getJSONArray("exercises").toString())
+
+            val importedRecords =
+                decodeRecords(backup.getJSONArray("records").toString())
+
+            val importedUnit =
+                if (backup.optString("unit", "kg") == "lb") "lb" else "kg"
+
+            exercises = importedExercises
+            records = importedRecords
+            unit = importedUnit
+
+            scope.launch {
+                (context as MainActivity).dataStore.edit {
+                    it[stringPreferencesKey("unit")] = importedUnit
+                    it[stringPreferencesKey("exercises")] =
+                        encodeExercises(importedExercises)
+                    it[stringPreferencesKey("records")] =
+                        encodeRecords(importedRecords)
+                }
+            }
+        }
+    }
+}
 
     LaunchedEffect(Unit) {
         val prefs = (context as MainActivity).dataStore.data.first()
@@ -163,10 +223,25 @@ fun PaoPRApp() {
                         )
                     }
 
-                    "settings" -> Settings(unit) {
-                        unit = it
-                        save()
-                    }
+                    "settings" -> Settings(
+                        unit = unit,
+                        set = {
+                            unit = it
+                            save()
+                        },
+                        export = {
+                            exportLauncher.launch("paopr_backup.json")
+                        },
+                        import = {
+                            importLauncher.launch(
+                                arrayOf(
+                                    "application/json",
+                                    "text/json",
+                                    "text/plain"
+                                )
+                            )
+                        }
+                    )
                 }
 
                 if (showAdd) {
@@ -477,13 +552,27 @@ fun ProgressChart(values: List<Double>) {
 }
 
 @Composable
-fun Settings(unit: String, set: (String) -> Unit) {
+fun Settings(
+    unit: String,
+    set: (String) -> Unit,
+    export: () -> Unit,
+    import: () -> Unit
+) {
     Column(
         Modifier.padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Ajustes", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Slate)
-        Text("Unidad de peso", fontWeight = FontWeight.Bold)
+        Text(
+            "Ajustes",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = Slate
+        )
+
+        Text(
+            "Unidad de peso",
+            fontWeight = FontWeight.Bold
+        )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             FilterChip(unit == "kg", { set("kg") }, "kg")
@@ -491,7 +580,46 @@ fun Settings(unit: String, set: (String) -> Unit) {
             FilterChip(unit == "lb", { set("lb") }, "lb")
         }
 
-        Text("Los datos se almacenan localmente en el teléfono.", color = Slate)
+        HorizontalDivider()
+
+        Text(
+            "Copia de seguridad",
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            "Exporta o importa tus ejercicios y registros en formato JSON.",
+            color = Slate
+        )
+
+        OutlinedButton(
+            onClick = export,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                Icons.Default.FileUpload,
+                contentDescription = null
+            )
+            Spacer(Modifier.width(8.dp))
+            Text("Exportar registros (JSON)")
+        }
+
+        OutlinedButton(
+            onClick = import,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                Icons.Default.FileDownload,
+                contentDescription = null
+            )
+            Spacer(Modifier.width(8.dp))
+            Text("Importar registros (JSON)")
+        }
+
+        Text(
+            "Los datos se almacenan localmente en el teléfono.",
+            color = Slate
+        )
     }
 }
 
@@ -671,7 +799,6 @@ fun defaultExercises() = listOf(
     Exercise("pj", "Push Jerk", "🏋️"),
     Exercise("bp", "Bench Press", "🏋️"),
     Exercise("thr", "Thruster", "🏋️"),
-    Exercise("ohs", "Overhead Squat", "🏋️"),
 
 )
 
